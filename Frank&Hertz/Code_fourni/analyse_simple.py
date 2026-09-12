@@ -60,14 +60,10 @@ ________________________________________________________________________________
 data_cropped_and_shifted = crop_ramp(
     data_array,
     ramp,
-    zero_threshold=0.0001,
+    zero_threshold=0.05,
     infinity_threshold=0.1
 ).copy()
 
-
-
-
-# Mettre vos données rognées et remises à t_0=0 dans cette variable
 data_cropped_and_shifted[:, time] -= data_cropped_and_shifted[0, time]
 
 """
@@ -101,15 +97,10 @@ facteur_valeur, facteur_incertitude = compute_conversion_factors(
     ramp
 )
 
-origine = np.mean(
-    data_cropped_and_shifted[:, ramp]
-    - facteur_valeur * data_cropped_and_shifted[:, time]
-)
-
 data_converted = data_cropped_and_shifted.copy()
 
 data_converted[:, time] = (
-    facteur_valeur * data_cropped_and_shifted[:, time] + origine
+    abs(facteur_valeur) * data_cropped_and_shifted[:, time]
 )
 
 data_converted[:, pico] *= 3.0
@@ -144,18 +135,16 @@ distance = int(np.ceil(3.0 / pas_tension))
 peak_indices_list = get_peaks_indices(
     data_converted,
     pico,
+    hauteur_minimum=0.03,
     distance_minumum=distance
 )
 
-
-
-# Mettre vos données avec les bonnes unités à la place du None
 positions = data_converted[peak_indices_list, time]
 V_res = np.mean(np.diff(positions))
 W = positions[0] - V_res
 
 print("Potentiel de résonance [V] :", V_res)
-print("W sur l'axe G1-ground [V] :", W)
+print("W avec l'origine de l'exemple [V] :", W)
 """
 _______________________________________________________________________________________________________________
 """
