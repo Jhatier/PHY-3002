@@ -3,8 +3,11 @@ from outils_analyse.identification_des_pics import get_peaks_indices
 from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp
 from outils_analyse.conversion_temps_en_potentiel import compute_conversion_factors
 import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import os
 import matplotlib
+import numpy as np
+
 
 matplotlib.rcParams.update({'font.size': 18})
 
@@ -22,12 +25,14 @@ ________________________________________________________________________________
 
 # Mettre votre code ici:
 
-
-
-
+fichier = os.path.join(
+    os.path.dirname(os.path.abspath(__file__)),
+    "exemples_fichiers",
+    "exemple_donnees.csv"
+)
 
 # Mettre vos valeurs extraites à la place de l'ellipse
-data_array = ...  # Array de trois colonnes
+data_array = read_csv(fichier, 10).astype(float)
 
 """
 _______________________________________________________________________________________________________________
@@ -53,12 +58,18 @@ ________________________________________________________________________________
 
 # Mettre votre code ici
 
+data_cropped_and_shifted = crop_ramp(
+    data_array,
+    ramp,
+    zero_threshold=0.0001,
+    infinity_threshold=0.1
+).copy()
 
 
 
 
 # Mettre vos données rognées et remises à t_0=0 dans cette variable
-data_cropped_and_shifted = ...  # Array de trois colonnes
+data_cropped_and_shifted[:, time] -= data_cropped_and_shifted[0, time]
 
 """
 _______________________________________________________________________________________________________________
@@ -85,17 +96,24 @@ ________________________________________________________________________________
 #       2. Convertir les valeurs de temps en valeurs de tension
 #       3. Convertir la tension du pico en courant
 
-# Mettre votre code ici
+facteur_valeur, facteur_incertitude = compute_conversion_factors(
+    data_cropped_and_shifted,
+    time,
+    ramp
+)
 
+origine = np.mean(
+    data_cropped_and_shifted[:, ramp]
+    - facteur_valeur * data_cropped_and_shifted[:, time]
+)
 
+data_converted = data_cropped_and_shifted.copy()
 
+data_converted[:, time] = (
+    facteur_valeur * data_cropped_and_shifted[:, time] + origine
+)
 
-
-# Mettre vos données avec les bonnes unités et vos informations par rapport à la pente à la place des ellipses
-data_converted = ...  # Array de trois colonnes
-facteur_valeur = ...  # Nombre à virgule
-facteur_incertitude = ...  # Nombre à virgule
-
+data_converted[:, pico] *= 3.0
 """
 _______________________________________________________________________________________________________________
 """
