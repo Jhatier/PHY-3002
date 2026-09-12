@@ -144,7 +144,7 @@ V_res = np.mean(np.diff(positions))
 W = positions[0] - V_res
 
 print("Potentiel de résonance [V] :", V_res)
-print("W avec l'origine de l'exemple [V] :", W)
+print("Potentiel de contact  [V] :", W)
 """
 _______________________________________________________________________________________________________________
 """
