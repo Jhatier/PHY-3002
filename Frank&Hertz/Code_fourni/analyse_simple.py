@@ -3,11 +3,10 @@ from outils_analyse.identification_des_pics import get_peaks_indices
 from outils_analyse.lecture_des_fichiers import read_csv, crop_ramp
 from outils_analyse.conversion_temps_en_potentiel import compute_conversion_factors
 import matplotlib.pyplot as plt
-import matplotlib.pyplot as plt
 import os
 import matplotlib
 import numpy as np
-
+import sigfig as sig
 
 matplotlib.rcParams.update({'font.size': 18})
 
@@ -139,13 +138,24 @@ ________________________________________________________________________________
 
 # Mettre votre code ici
 
+pas_tension = np.median(np.diff(data_converted[:, time]))
+distance = int(np.ceil(3.0 / pas_tension))
 
+peak_indices_list = get_peaks_indices(
+    data_converted,
+    pico,
+    distance_minumum=distance
+)
 
 
 
 # Mettre vos données avec les bonnes unités à la place du None
-peak_indices_list = ...  # Liste de nombres entiers
+positions = data_converted[peak_indices_list, time]
+V_res = np.mean(np.diff(positions))
+W = positions[0] - V_res
 
+print("Potentiel de résonance [V] :", V_res)
+print("W sur l'axe G1-ground [V] :", W)
 """
 _______________________________________________________________________________________________________________
 """
